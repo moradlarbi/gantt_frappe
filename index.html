@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Simple Gantt</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #ccc;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+        }
+        /* Custom class */
+        .gantt .bar-milestone .bar {
+            fill: tomato;
+        }
+        .heading {
+            text-align: center;
+        }
+        .gantt-target.dark {
+            background-color: #252525;
+        }
+        #exportButton {
+            background-color: #4CAF50; /* Couleur de fond verte */
+            color: white;              /* Texte blanc */
+            padding: 10px 20px;        /* Espacement intérieur */
+            font-size: 16px;           /* Taille du texte */
+            border: none;              /* Pas de bordure */
+            border-radius: 5px;        /* Coins arrondis */
+            cursor: pointer;           /* Curseur en forme de main */
+            transition: background-color 0.3s ease; /* Animation au survol */
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Ombre légère */
+            margin-bottom: 20px;
+        }
+
+        /* Changer la couleur au survol */
+        #exportButton:hover {
+            background-color: #45a049; /* Couleur plus sombre */
+        }
+
+        /* Effet de clic */
+        #exportButton:active {
+            transform: scale(0.98);    /* Réduction légère */
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Réduction de l'ombre */
+        }
+    </style>
+    <link rel="stylesheet" href="dist/frappe-gantt.css" />
+    <script src="dist/frappe-gantt.umd.js"></script>
+    <!-- Ajouter la bibliothèque SheetJS pour l'exportation vers Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2 class="heading">
+            Interactive Gantt Chart entirely made in SVG!
+        </h2>
+        <!-- Bouton pour exporter les tâches en Excel -->
+        <button id="exportButton">Export to Excel</button>
+        <div class="gantt-target"></div>
+    </div>
+
+    <script type="module">
+       
+
+        // Définir les tâches
+        let tasks = [
+            {
+                start: '2024-04-01',
+                end: '2024-04-01',
+                name: 'Redesign website',
+                id: 'Task 0',
+                progress: 30,
+            },
+            {
+                start: '2024-03-26',
+                duration: '6d',
+                name: 'Write new content',
+                id: 'Task 1',
+                progress: 5,
+                important: true,
+            },
+            {
+                start: '2024-04-04',
+                end: '2024-04-08',
+                name: 'Apply new styles',
+                id: 'Task 2',
+                progress: 80,
+                dependencies: 'Task 1',
+            },
+            {
+                start: '2024-04-08',
+                end: '2024-04-09',
+                name: 'Review',
+                id: 'Task 3',
+                progress: 5,
+                dependencies: 'Task 2',
+            },
+            {
+                start: '2024-04-08',
+                end: '2024-04-10',
+                name: 'Deploy',
+                id: 'Task 4',
+                progress: 0,
+            },
+            {
+                start: '2024-04-21',
+                end: '2024-04-29',
+                name: 'Go Live!',
+                id: 'Task 5',
+                progress: 0,
+                dependencies: 'Task 2',
+                custom_class: 'bar-milestone',
+            }
+        ];
+
+        // Créer le diagramme de Gantt
+        let gantt_chart = new Gantt('.gantt-target', tasks, {
+            on_click (task) {
+                console.log('Click', task);
+            },
+            view_mode: 'Day',
+            view_mode_padding: { DAY: '3d' },
+        });
+
+        // Fonction pour exporter les tâches en fichier Excel
+        function exportToExcel() {
+            let worksheet = XLSX.utils.json_to_sheet(tasks);
+            let workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Tasks");
+            XLSX.writeFile(workbook, "Gantt_Tasks.xlsx");
+        }
+
+        // Ajouter un écouteur d'événement au bouton d'exportation
+        document.getElementById("exportButton").addEventListener("click", exportToExcel);
+    </script>
+</body>
+</html>
